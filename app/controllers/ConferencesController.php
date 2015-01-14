@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use JoindIn\Client;
 
 class ConferencesController extends BaseController
@@ -134,9 +135,14 @@ class ConferencesController extends BaseController
             return Redirect::to('/');
         }
 
+        $talksAtConference = $conference->myTalks();
+        $myOtherTalks = Auth::user()->talks->diff($talksAtConference);
+
         return View::make('conferences.show')
             ->with('conference', $conference)
-            ->with('author', $conference->author);
+            ->with('author', $conference->author)
+            ->with('talksAtConference', $talksAtConference)
+            ->with('talksNotAtConference', $myOtherTalks);
     }
 
     /**

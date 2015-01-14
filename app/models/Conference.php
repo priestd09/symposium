@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class Conference extends UuidBase
 {
@@ -24,6 +25,11 @@ class Conference extends UuidBase
         return $this->belongsTo('User', 'author_id');
     }
 
+    /**
+     * Whether or not CFP is currently open
+     *
+     * @return bool
+     */
     public function cfpIsOpen()
     {
         if ($this->cfp_starts_at == null || $this->cfp_ends_at == null) return false;
@@ -39,9 +45,20 @@ class Conference extends UuidBase
         return $this->belongstoMany('User', 'favorites')->withTimestamps();
     }
 
+    /**
+     * Whether or not the current user favorited this conference
+     *
+     * @return bool
+     */
     public function isFavorited()
     {
         return \Auth::user()->favoritedConferences->contains($this->id);
+    }
+
+    public function myTalks()
+    {
+        return new Collection;
+        // @todo: Return all talks the current user submitted to this conf
     }
 
 
