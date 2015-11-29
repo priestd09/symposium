@@ -19,10 +19,10 @@ class Talk extends UuidBase
         return $this->belongsTo('User', 'author_id');
     }
 
-//    public function submissions()
-//    {
-//        return $this->belongsToMany('Conference');
-//    }
+   public function submissions()
+   {
+       return $this->belongsToMany('Conference');
+   }
 
     public function current()
     {

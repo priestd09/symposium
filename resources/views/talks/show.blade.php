@@ -25,7 +25,10 @@
                 <p style="font-style: italic;">
                     {{ $current->length }} minute {{ $current->level }} {{ $current->type }}
                 </p>
-
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-md-push-2">
                 <h3>Description/Proposal</h3>
                 {{ $current->getHtmledDescription() }}
 
@@ -48,6 +51,16 @@
                     </ul>
                 @endif
                 @endif
+            </div>
+            <div class="col-md-4 col-md-push-2">
+                <h3>Conferences</h3>
+                @forelse ($talk->submissions as $submission)
+                    BOOP
+                @empty
+                    None
+                @endforelse
+            </div>
+        </div>
             </div>
         </div>
     </div>
