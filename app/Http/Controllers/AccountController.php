@@ -1,5 +1,6 @@
 <?php namespace Symposium\Http\Controllers;
 
+use Illuminate\Contracts\Filesystem\Factory as Files;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -94,8 +95,7 @@ class AccountController extends BaseController
 
     public function destroy()
     {
-        $userId = Auth::user()->id;
-        $user = User::find($userId);
+        $user = Auth::user(); 
 
         Auth::logout();
 
@@ -106,12 +106,7 @@ class AccountController extends BaseController
         return redirect('/');
     }
 
-    /**
-     * @param \Illuminate\Contracts\Filesystem\Factory $storage
-     *
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
-     */
-    public function export(\Illuminate\Contracts\Filesystem\Factory $storage)
+    public function export(Files $storage)
     {
         $user = Auth::user();
         $user->load('talks.revisions');
