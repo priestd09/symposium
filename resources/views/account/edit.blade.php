@@ -14,12 +14,11 @@
             </div>
         </div>
 
-        {{ Form::model($user, ['route' => 'account.edit', 'method' => 'put']) }}
+        {{ Form::model($user, ['route' => 'account.edit', 'method' => 'put', 'files' => 'true']) }}
 
         <div class="row">
             <div class="col-md-5 col-md-push-1">
                 <h3>User</h3>
-
                 <div class="form-group">
                     {{ Form::label('email', 'Email Address', ['class' => 'control-label']) }}
                     {{ Form::email('email', null, ['class' => 'form-control']) }}
@@ -33,6 +32,21 @@
                 <div class="form-group">
                     {{ Form::label('name', 'Name', ['class' => 'control-label']) }}
                     {{ Form::text('name', null, ['class' => 'form-control']) }}
+                </div>
+
+                <div class="form-group">
+                    {{ Form::label('profile_picture', 'Profile Picture', ['class' => 'control-label']) }}
+                    <div class="private-profile-pic">
+                        <img src="{{ Auth::user()->profile_picture_hires }}" class="public-speaker-picture" alt="">
+                    </div>
+                    @if($user->profile_picture == null)
+                        <div class="alert alert-warning">
+                            <strong>Your current public profile picture is sourced from Gravatar.</strong><br>
+                            Please upload a custom profile picture.
+                        </div>
+                    @endif
+                    <span class="help-block">Please use a high resolution image, as it will be provided to conference organizers.</span>
+                    {{ Form::file('profile_picture', null, ['class' => 'form-control']) }}
                 </div>
             </div>
             <div class="col-md-5 col-md-push-1">
@@ -71,6 +85,20 @@
                     <span class="help-block">This paragraph will go at the top of your public speaker profile page. You can use it to communicate any message you'd like to conference organizers.</span>
                     {{ Form::textarea('profile_intro', null, ['class' => 'form-control']) }}
                 </div>
+
+                <div class="form-group">
+                    {{ Form::label('location', 'Location', ['class' => 'control-label']) }}
+                    <span class="help-block">Enter the city in which you reside and local conference organizers can find you.</span>
+                    {{ Form::text('location', null, ['class' => 'form-control', 'id' => 'autocomplete']) }}
+                </div>
+
+                <div class="form-group">
+                    {{ Form::hidden('neighborhood', null, ['id' => 'neighborhood', 'readonly' => true]) }}
+                    {{ Form::hidden('sublocality', null, ['id' => 'sublocality_level_1', 'readonly' => true]) }}
+                    {{ Form::hidden('city', null, ['id' => 'locality', 'readonly' => true]) }}
+                    {{ Form::hidden('state', null, ['id' => 'administrative_area_level_1', 'readonly' => true]) }}
+                    {{ Form::hidden('country', null, ['id' => 'country', 'readonly' => true]) }}
+                </div>
             </div>
         </div>
         <div class="row">
@@ -82,3 +110,8 @@
         {{ Form::close() }}
     </div>
 @stop
+
+@push('scripts')
+<script src="{{ elixir('js/location.js') }}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.key') }}&libraries=places&callback=initAutocomplete" async defer></script>
+@endpush

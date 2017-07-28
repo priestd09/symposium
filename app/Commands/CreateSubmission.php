@@ -1,9 +1,9 @@
-<?php namespace App\Commands;
+<?php
 
-use Conference;
-use App\Commands\Command;
-use Talk;
-use TalkRevision;
+namespace App\Commands;
+
+use App\Conference;
+use App\Talk;
 
 class CreateSubmission extends Command
 {
@@ -20,6 +20,7 @@ class CreateSubmission extends Command
     {
         $conference = Conference::findOrFail($this->conferenceId);
         $talk = Talk::findOrFail($this->talkId);
+
         $conference->submissions()->save($talk->current(), [
             'status' => 'submitted'
         ]);

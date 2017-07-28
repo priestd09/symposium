@@ -69,6 +69,10 @@ legend {
     width: inherit;
 }
 
+.u-bold {
+    font-weight: bold;
+}
+
 .container {
     @extend .container;
     position: relative;
@@ -147,10 +151,13 @@ legend {
 
 %notice {
     @extend .alert;
-    margin-top: 1em;
-    position: absolute;
-    width: 100%;
+    right: 1em;
+    top: 8em;
+    position: fixed;
+    width: 20%;
+    min-width: 250px;
     z-index: 200;
+    text-align: center;
 }
 
 .notice-success {
@@ -185,6 +192,7 @@ legend {
     color: #888;
     font-size: 0.9em;
     padding-left: 0.5em;
+    padding-right: 0.5em;
     text-transform: uppercase;
 
     a {
@@ -243,7 +251,7 @@ legend {
 
 .page-meta-buttons {
     .btn {
-        float: right;
+        display: block;
         margin-left: 1rem;
         margin-bottom: 0.5rem;
     }
@@ -315,6 +323,7 @@ legend {
 
 .page-title {
     margin-top: 0;
+    vertical-align: middle;
 }
 
 .talk-body {
@@ -365,9 +374,20 @@ legend {
     img {
         border-radius: 50%;
     }
+    
+    a {
+        text-decoration: none;
+    }
 
     @media only screen and (min-width: 768px) {
         float: right;
+    }
+}
+.private-profile-pic {
+    text-align: center;
+
+    img {
+        border-radius: 50%;
     }
 }
 .public-profile-intro {

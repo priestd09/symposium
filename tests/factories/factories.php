@@ -1,20 +1,22 @@
 <?php
 
-$factory('Conference', 'conference', [
+use Carbon\Carbon;
+
+$factory(\App\Conference::class, 'conference', [
     'author_id' => 1,
     'title' => 'Dummy Conference',
     'description' => 'A conference for dummies.',
     'url' => 'http://example.com',
-    'starts_at' => new DateTime,
-    'ends_at' => new DateTime,
-    'cfp_starts_at' => new DateTime,
-    'cfp_ends_at' => new DateTime,
+    'starts_at' => Carbon::now()->addDays(10),
+    'ends_at' => Carbon::now()->addDays(12),
+    'cfp_starts_at' => Carbon::now()->subDays(2),
+    'cfp_ends_at' => Carbon::now()->addDays(1),
 ]);
 
-$factory('Talk', 'talk', [
+$factory(\App\Talk::class, 'talk', [
 ]);
 
-$factory('TalkRevision', 'talkRevision', [
+$factory(App\TalkRevision::class, 'talkRevision', [
     'title' => 'My Awesome Title',
     'type' => 'lightning',
     'length' => '9',
@@ -24,13 +26,13 @@ $factory('TalkRevision', 'talkRevision', [
     'organizer_notes' => 'No really.',
 ]);
 
-$factory('App\User', 'user', [
+$factory(\App\User::class, 'user', [
     'email' => $faker->email,
     'password' => Hash::make('password'),
     'name' => 'Jane Doe',
 ]);
 
-$factory('Bio', 'bio', [
+$factory(\App\Bio::class, 'bio', [
     'nickname' => 'short',
     'body' => 'Lorem ipsum datum',
 ]);

@@ -4,16 +4,20 @@
  * Public
  */
 Route::get('/', function () {
-    return View::make('home');
+    return view('home');
 });
 
 Route::get('what-is-this', function () {
-    return View::make('what-is-this');
+    return view('what-is-this');
 });
 
 Route::get('speakers', [
     'as' => 'speakers-public.index',
     'uses' => 'PublicProfileController@index'
+]);
+Route::post('speakers', [
+    'as' => 'speakers-public.search',
+    'uses' => 'PublicProfileController@search'
 ]);
 Route::get('u/{profileSlug}', [
     'as' => 'speakers-public.show',
@@ -36,29 +40,12 @@ Route::post('u/{profileSlug}/email', [
     'uses' => 'PublicProfileController@postEmail'
 ]);
 
-// temp fix
-Route::get('conferences/create', ['middleware' => 'auth', 'as' => 'conferences.create', 'uses' => 'ConferencesController@create']);
-
-Route::get('conferences/{id}', ['as' => 'conferences.public', 'uses' => 'ConferencesController@show']);
-
 /**
  * App
  */
-Route::get('log-out', ['as' => 'log-out', 'uses' => 'AuthController@logout']);
+Route::get('log-out', ['as' => 'log-out', 'uses' => 'Auth\LoginController@logout']);
 
-Route::group(['middleware' => 'guest'], function () {
-    Route::get('password/email', 'Auth\PasswordController@getEmail');
-    Route::post('password/email', 'Auth\PasswordController@postEmail');
-
-    Route::get('password/reset/{token}', 'Auth\PasswordController@getReset');
-    Route::post('password/reset', 'Auth\PasswordController@postReset');
-
-    Route::get('log-in', ['as' => 'log-in', 'uses' => 'AuthController@getLogin']);
-    Route::post('log-in', 'AuthController@postLogin');
-
-    Route::get('sign-up', ['as' => 'sign-up', 'uses' => 'AccountController@create']);
-    Route::post('sign-up', 'AccountController@store');
-});
+Auth::routes();
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('account', ['as' => 'account.show', 'uses' => 'AccountController@show']);
@@ -85,23 +72,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('bios/{id}/delete', ['as' => 'bios.delete', 'uses' => 'BiosController@destroy']);
 
     Route::get('dashboard', ['as' => 'dashboard', 'uses' => 'DashboardController@index']);
+    Route::get('archive', ['as' =>'talks.archived.index', 'uses' => 'TalksController@archiveIndex']);
+    Route::get('talks/{id}/archive', ['as' => 'talks.archive', 'uses' => 'TalksController@archive']);
+    Route::get('talks/{id}/restore', ['as' => 'talks.restore', 'uses' => 'TalksController@restore']);
     Route::resource('talks', 'TalksController');
-    Route::resource('conferences', 'ConferencesController');
+    Route::resource('conferences', 'ConferencesController', [
+        'except' => ['index', 'show']
+    ]);
     Route::resource('bios', 'BiosController');
 });
 
-/**
- * API
- */
-Route::group(['prefix' => 'api', 'namespace' => 'Api', 'middleware' => 'oauth'], function () {
-    Route::get('me', 'MeController@index');
-    Route::get('bios/{bioId}', 'BiosController@show');
-    Route::get('user/{userId}/bios', 'UserBiosController@index');
-    Route::get('talks/{talkId}', 'TalksController@show');
-    Route::get('user/{userId}/talks', 'UserTalksController@index');
-    Route::get('conferences/{id}', 'ConferencesController@show');
-    Route::get('conferences', 'ConferencesController@index');
-});
+Route::get('conferences', ['as' => 'conferences.index', 'uses' => 'ConferencesController@index']);
+Route::get('conferences/{id}', ['as' => 'conferences.show', 'uses' => 'ConferencesController@show']);
 
 /**
  * OAuth

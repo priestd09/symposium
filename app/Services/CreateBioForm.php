@@ -1,6 +1,8 @@
-<?php namespace App\Services;
+<?php
 
-use Bio;
+namespace App\Services;
+
+use App\Bio;
 use App\Exceptions\ValidationException;
 use Validator;
 
@@ -18,6 +20,7 @@ class CreateBioForm
     private function __construct($input, $user)
     {
         $this->input = $this->removeEmptyFields($input);
+        $this->input['public'] = $this->input['public'] == 'yes';
         $this->user = $user;
     }
 

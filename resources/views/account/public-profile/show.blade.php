@@ -5,7 +5,9 @@
         <div class="row">
             <div class="col-md-10 col-md-push-1">
                 <div class="public-profile-pic">
-                    <img src="{{ Gravatar::src($user->email, 200) }}" class="public-speaker-picture"><br>
+                    <a href="{{ $user->profile_picture_hires }}">
+                        <img src="{{ $user->profile_picture_hires }}" class="public-speaker-picture">
+                    </a><br>
                     @if ($user->allow_profile_contact)
                     <a href="{{ route('speakers-public.email', ['profileSlug' => $user->profile_slug]) }}">Contact {{ $user->name }}</a>
                     @endif
@@ -41,6 +43,11 @@
                     @foreach ($bios as $bio)
                     <h3><a href="{{ route('speakers-public.bios.show', ['profile_slug' => $user->profile_slug, 'bio_id' => $bio->id]) }}">{{ $bio->nickname }}</a></h3>
                     @endforeach
+                @endif
+
+                @if ($user->location)
+                    <h2>Location</h2>
+                    {{  $user->location }}</p>
                 @endif
             </div>
         </div>

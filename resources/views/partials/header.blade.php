@@ -1,3 +1,4 @@
+@include('partials.flash-messages')
 <div class="primary-header" role="navigation">
     <div class="container">
         <div class="primary-header__title">
@@ -7,8 +8,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="{{ Auth::check() ? route('dashboard') : '/' }}" class="logo">
-                <img src="/img/symposium-logo.png" alt="Symposium">
+            <a href="{{ Auth::check() ? route('dashboard') : url('/') }}" class="logo">
+                <img src="{{ url('/img/symposium-logo.png') }}" alt="Symposium">
             </a>
         </div>
         <div class="primary-header__collapse">
@@ -17,5 +18,3 @@
         <!--/.navbar-collapse -->
     </div>
 </div>
-
-@include('partials.flash-messages')

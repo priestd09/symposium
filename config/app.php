@@ -2,6 +2,18 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Name
+    |--------------------------------------------------------------------------
+    |
+    | This value is the name of your application. This value is used when the
+    | framework needs to place the application's name in a notification or
+    | any other location as required by the application or its packages.
+    */
+
+    'name' => 'Symposium',
+
     'env' => env('APP_ENV', 'production'),
 
 
@@ -83,7 +95,7 @@ return [
 
     'key' => env('APP_KEY', 'YourSecretKey!!!'),
 
-    'cipher' => MCRYPT_RIJNDAEL_128,
+    'cipher' => 'AES-256-CBC',
 
     /*
     |--------------------------------------------------------------------------
@@ -126,6 +138,7 @@ return [
         'Illuminate\Foundation\Providers\FoundationServiceProvider',
         'Illuminate\Hashing\HashServiceProvider',
         'Illuminate\Mail\MailServiceProvider',
+        Illuminate\Notifications\NotificationServiceProvider::class,
         'Illuminate\Pagination\PaginationServiceProvider',
         'Illuminate\Pipeline\PipelineServiceProvider',
         'Illuminate\Queue\QueueServiceProvider',
@@ -137,14 +150,17 @@ return [
         'Illuminate\View\ViewServiceProvider',
         'Illuminate\Broadcasting\BroadcastServiceProvider',
         'Illuminate\Bus\BusServiceProvider',
+        Laravel\Scout\ScoutServiceProvider::class,
+
 
         /*
          * Application Service Providers...
          */
         'App\Providers\AppServiceProvider',
+        // App\Providers\BroadcastServiceProvider::class,
         'App\Providers\EventServiceProvider',
         'App\Providers\RouteServiceProvider',
-        // 'Bugsnag\BugsnagLaravel\BugsnagLaravelServiceProvider',
+        'Bugsnag\BugsnagLaravel\BugsnagServiceProvider',
 
         'Collective\Html\HtmlServiceProvider',
         'Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider',
@@ -152,9 +168,12 @@ return [
         'Maknz\Slack\SlackServiceProvider',
         'LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider',
         'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
+        PragmaRX\Firewall\Vendor\Laravel\ServiceProvider::class,
 
         'App\Providers\OAuthGuardServiceProvider',
         App\Providers\CaptchaServiceProvider::class,
+        App\Providers\JoindInServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -174,6 +193,7 @@ return [
         'Artisan'   => 'Illuminate\Support\Facades\Artisan',
         'Auth'      => 'Illuminate\Support\Facades\Auth',
         'Blade'     => 'Illuminate\Support\Facades\Blade',
+        'Bus' => Illuminate\Support\Facades\Bus::class,
         'Cache'     => 'Illuminate\Support\Facades\Cache',
         'Config'    => 'Illuminate\Support\Facades\Config',
         'Cookie'    => 'Illuminate\Support\Facades\Cookie',
@@ -187,6 +207,7 @@ return [
         'Lang'      => 'Illuminate\Support\Facades\Lang',
         'Log'       => 'Illuminate\Support\Facades\Log',
         'Mail'      => 'Illuminate\Support\Facades\Mail',
+        'Notification' => Illuminate\Support\Facades\Notification::class,
         'Paginator' => 'Illuminate\Support\Facades\Paginator',
         'Password'  => 'Illuminate\Support\Facades\Password',
         'Queue'     => 'Illuminate\Support\Facades\Queue',
@@ -200,13 +221,15 @@ return [
         'URL'       => 'Illuminate\Support\Facades\URL',
         'Validator' => 'Illuminate\Support\Facades\Validator',
         'View'      => 'Illuminate\Support\Facades\View',
-        // 'Bugsnag'   => 'Bugsnag\BugsnagLaravel\BugsnagFacade',
+        'Bugsnag'   => 'Bugsnag\BugsnagLaravel\Facades\Bugsnag',
         'Form'      => 'Collective\Html\FormFacade',
         'HTML'      => 'Collective\Html\HtmlFacade',
         'Gravatar'  => 'Thomaswelton\LaravelGravatar\Facades\Gravatar',
         'Twitter'   => 'Thujohn\Twitter\Facades\Twitter',
         'Slack'     => 'Maknz\Slack\Facades\Slack',
         'Authorizer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade',
+        'Image'     => Intervention\Image\Facades\Image::class,
+        'Firewall' => PragmaRX\Firewall\Vendor\Laravel\Facade::class,
     ],
 
 ];

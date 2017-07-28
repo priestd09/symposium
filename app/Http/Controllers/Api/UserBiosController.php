@@ -1,9 +1,10 @@
-<?php namespace App\Http\Controllers\Api;
+<?php
 
-use Illuminate\Support\Facades\App;
+namespace App\Http\Controllers\Api;
+
 use App\ApiResources\Bio;
 use App\OAuthGuard\Facades\OAuthGuard;
-use App\User;
+use Illuminate\Support\Facades\App;
 
 class UserBiosController extends BaseController
 {

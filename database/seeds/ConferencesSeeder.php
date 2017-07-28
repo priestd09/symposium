@@ -1,5 +1,6 @@
 <?php
 
+use App\Conference;
 use App\User;
 use Carbon\Carbon;
 use Faker\Factory as Faker;
@@ -13,7 +14,7 @@ class ConferencesSeeder extends Seeder
         Conference::truncate();
 
         $faker = Faker::create();
-        $user_ids = collect(User::lists('id'));
+        $user_ids = collect(User::pluck('id'));
         $conference_names = collect([
             'MegaAwesomeCon',
             'SuperPHP',

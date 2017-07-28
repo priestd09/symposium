@@ -1,11 +1,11 @@
-<?php namespace App\Http\Controllers\Api;
+<?php
+
+namespace App\Http\Controllers\Api;
 
 use App;
-use Exception;
-use Illuminate\Support\Facades\Auth;
 use App\ApiResources\Bio;
 use App\OAuthGuard\Facades\OAuthGuard;
-use App\User;
+use Exception;
 
 class BiosController extends BaseController
 {

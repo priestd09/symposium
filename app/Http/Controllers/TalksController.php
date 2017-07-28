@@ -1,15 +1,13 @@
-<?php namespace App\Http\Controllers;
+<?php
 
-use Auth;
-use Input;
-use Log;
-use Redirect;
-use Session;
-use Talk;
-use TalkRevision;
-use App\User;
-use Validator;
-use View;
+namespace App\Http\Controllers;
+
+use App\Talk;
+use App\TalkRevision;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
 class TalksController extends BaseController
 {
@@ -25,35 +23,18 @@ class TalksController extends BaseController
         'slides.url' => 'Slides URL must contain a valid URL',
     ];
 
-    protected $sorting_talks = [
-        'date' => '',
-        'alpha' => '',
-    ];
+    protected $sorted_by = 'alpha';
 
-    public function index()
+    public function index(Request $request)
     {
-        $bold_style = 'style="font-weight: bold;"';
+        $talks = $this->sortTalks(
+            auth()->user()->talks()->active()->get(),
+            $request->input('sort')
+        );
 
-        $sorting_talk = $this->sorting_talks;
-
-        switch (Input::get('sort')) {
-            case 'date':
-                $sorting_talk['date'] = $bold_style;
-                $talks = Auth::user()->talks->sortByDesc('created_at');
-                break;
-            case 'alpha':
-                // Pass through
-            default:
-                $sorting_talk['alpha'] = $bold_style;
-                $talks = Auth::user()->talks->sortBy(function ($talk) {
-                    return strtolower($talk->current()->title);
-                });
-                break;
-        }
-
-        return View::make('talks.index')
+        return view('talks.index')
             ->with('talks', $talks)
-            ->with('sorting_talk', $sorting_talk);
+            ->with('sorted_by', $this->sorted_by);
     }
 
     public function create()
@@ -64,103 +45,153 @@ class TalksController extends BaseController
         ]);
         $talk = new Talk;
 
-        return View::make('talks.create', compact('current', 'talk'));
+        return view('talks.create', ['current' => $current, 'talk' => $talk]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $validator = Validator::make(Input::all(), $this->rules, $this->messages);
+        $validator = Validator::make($request->all(), $this->rules, $this->messages);
 
         if ($validator->passes()) {
             // Save
-            $talk = new Talk;
-            $talk->author_id = Auth::user()->id;
-            $talk->public = Input::get('public') == 'yes';
-            $talk->save();
+            $talk = Talk::create([
+                'author_id' => auth()->user()->id,
+                'public' => $request->input('public') == 'yes',
+            ]);
 
-            $revision = new TalkRevision;
-            $revision->title = Input::get('title');
-            $revision->type = Input::get('type');
-            $revision->length = Input::get('length');
-            $revision->level = Input::get('level');
-            $revision->description = Input::get('description');
-            $revision->slides = Input::get('slides');
-            $revision->organizer_notes = Input::get('organizer_notes');
-            $revision->talk_id = $talk->id;
-            $revision->save();
+            $revision = TalkRevision::create([
+                'title' => $request->input('title'),
+                'type' => $request->input('type'),
+                'length' => $request->input('length'),
+                'level' => $request->input('level'),
+                'description' => $request->input('description'),
+                'slides' => $request->input('slides'),
+                'organizer_notes' => $request->input('organizer_notes'),
+                'talk_id' => $talk->id,
+            ]);
 
             Session::flash('message', 'Successfully created new talk.');
 
-            return Redirect::to('/talks/' . $talk->id);
+            return redirect('/talks/' . $talk->id);
         }
 
-        return Redirect::to('talks/create')
+        return redirect('talks/create')
             ->withErrors($validator)
             ->withInput();
     }
 
-    public function edit($talkId)
+    public function edit($id)
     {
         try {
-            $talk = Auth::user()->talks()->findOrFail($talkId);
+            $talk = auth()->user()->talks()->findOrFail($id);
         } catch (Exception $e) {
             Session::flash('error-message', 'Sorry, but that isn\'t a valid URL.');
             Log::error($e);
-            return Redirect::to('/');
+            return redirect('/');
         }
 
-        return View::make('talks.edit')
+        return view('talks.edit')
             ->with('talk', $talk)
             ->with('current', $talk->current());
     }
 
-    public function update($talkId)
+    public function update($id, Request $request)
     {
-        $validator = Validator::make(Input::all(), $this->rules, $this->messages);
+        $validator = Validator::make($request->all(), $this->rules, $this->messages);
+
+
 
         if ($validator->passes()) {
-            $talk = Auth::user()->talks()->findOrFail($talkId);
-            $talk->public = Input::get('public') == 'yes';
-            $talk->save();
+            $talk = auth()->user()->talks()->findOrFail($id);
+            $talk->update(['public' => $request->input('public') == 'yes']);
 
-            $revision = new TalkRevision;
-            $revision->title = Input::get('title');
-            $revision->type = Input::get('type');
-            $revision->length = Input::get('length');
-            $revision->level = Input::get('level');
-            $revision->description = Input::get('description');
-            $revision->slides = Input::get('slides');
-            $revision->organizer_notes = Input::get('organizer_notes');
-            $revision->talk_id = $talk->id;
-            $revision->save();
+            $revision = TalkRevision::create([
+                'title' => $request->input('title'),
+                'type' => $request->input('type'),
+                'length' => $request->input('length'),
+                'level' => $request->input('level'),
+                'description' => $request->input('description'),
+                'slides' => $request->input('slides'),
+                'organizer_notes' => $request->input('organizer_notes'),
+                'talk_id' => $talk->id,
+            ]);
 
             Session::flash('message', 'Successfully edited talk.');
 
-            return Redirect::to('talks/' . $talk->id);
+            return redirect('talks/' . $talk->id);
         }
 
-        return Redirect::to('talks/' . $talkId . '/edit')
+        return redirect('talks/' . $id . '/edit')
             ->withErrors($validator)
             ->withInput();
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $talk = Auth::user()->talks()->findOrFail($id);
-        $current = Input::has('revision') ? $talk->revisions()->findOrFail(Input::get('revision')) : $talk->current();
+        $talk = auth()->user()->talks()->findOrFail($id);
 
-        return View::make('talks.show')
+        $current = $request->has('revision') ? $talk->revisions()->findOrFail($request->input('revision')) : $talk->current();
+
+        return view('talks.show')
             ->with('talk', $talk)
-            ->with('showingRevision', Input::has('revision'))
+            ->with('showingRevision', $request->has('revision'))
             ->with('current', $current);
     }
 
     public function destroy($id)
     {
-        Auth::user()->talks()->findOrFail($id)->delete();
+        auth()->user()->talks()->findOrFail($id)->delete();
 
         Session::flash('message', 'Successfully deleted talk.');
 
-        return Redirect::to('talks');
+        return redirect('talks');
+    }
+
+    public function archiveIndex(Request $request)
+    {
+        $talks = $this->sortTalks(
+            auth()->user()->talks()->archived()->get(),
+            $request->input('sort')
+        );
+
+        return view('talks.archive')
+          ->with('talks', $talks)
+          ->with('sorted_by', $this->sorted_by);
+    }
+
+    public function archive($id)
+    {
+        auth()->user()->talks()->findOrFail($id)->archive();
+
+        Session::flash('message', 'Successfully archived talk.');
+
+        return redirect('talks');
+    }
+
+    public function restore($id)
+    {
+        auth()->user()->talks()->findOrFail($id)->restore();
+
+        Session::flash('message', 'Successfully restored talk.');
+
+        return redirect('archive');
+    }
+
+    private function sortTalks($talks, $sort)
+    {
+        switch ($sort) {
+            case 'date':
+                $this->sorted_by = 'date';
+                return $talks->sortByDesc('created_at');
+                break;
+            case 'alpha':
+            // Pass through
+            default:
+                $this->sorted_by = 'alpha';
+                return $talks->sortBy(function ($talk) {
+                    return strtolower($talk->current()->title);
+                });
+                break;
+        }
     }
 }

@@ -7,7 +7,7 @@
             <li><a href="{{ route('talks.index') }}">Talks</a></li>
             <li class="dropdown" role="presentation">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                    <img src="{{ Gravatar::src(Auth::user()->email) }}" class="nav-profile-picture"> Me <span class="caret"></span>
+                    <img src="{{ Auth::user()->profile_picture_thumb }}" class="nav-profile-picture"> Me <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{{ route('account.show') }}">Account</a></li>
@@ -18,10 +18,11 @@
                 </ul>
             </li>
         @else
-            <li><a href="/what-is-this">What is this?</a></li>
-            <li><a href="/speakers">Our speakers</a></li>
-            <li><a href="{{ route('log-in') }}">Log in</a></li>
-            <li><a href="{{ route('sign-up') }}">Sign up</a></li>
+            <li><a href="{{ url('what-is-this') }}">What is this?</a></li>
+            <li><a href="{{ url('speakers') }}">Our speakers</a></li>
+            <li><a href="{{ route('conferences.index') }}">Conferences</a></li>
+            <li><a href="{{ route('login') }}">Log in</a></li>
+            <li><a href="{{ route('register') }}">Sign up</a></li>
         @endif
     </ul>
 </nav>

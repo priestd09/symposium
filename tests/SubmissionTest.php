@@ -1,19 +1,20 @@
 <?php
 
-use Carbon\Carbon;
-use Laracasts\TestDummy\Factory;
 use App\Commands\CreateSubmission;
 use App\Commands\DestroySubmission;
+use App\Conference;
+use Illuminate\Support\Facades\Session;
+use Laracasts\TestDummy\Factory;
 
 class SubmissionTest extends IntegrationTestCase
 {
     /** @test */
-    public function submitting_attaches_to_conference()
+    function submitting_attaches_to_conference()
     {
         $user = Factory::create('user');
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
         $revision = Factory::create('talkRevision');
         $talk->revisions()->save($revision);
@@ -24,12 +25,12 @@ class SubmissionTest extends IntegrationTestCase
     }
 
     /** @test */
-    public function un_submitting_deletes_submission()
+    function un_submitting_deletes_submission()
     {
         $user = Factory::create('user');
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
         $revision = Factory::create('talkRevision');
         $talk->revisions()->save($revision);
@@ -42,7 +43,7 @@ class SubmissionTest extends IntegrationTestCase
     }
 
     /** @test */
-    public function un_submitting_deletes_only_this_conference_submission()
+    function un_submitting_deletes_only_this_conference_submission()
     {
         $user = Factory::create('user');
 
@@ -50,13 +51,13 @@ class SubmissionTest extends IntegrationTestCase
         $conference2 = Factory::create('conference');
 
         $talk1 = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
         $talk1revision = Factory::create('talkRevision');
         $talk1->revisions()->save($talk1revision);
 
         $talk2 = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
         $talk2revision = Factory::create('talkRevision');
         $talk2->revisions()->save($talk2revision);
@@ -73,16 +74,16 @@ class SubmissionTest extends IntegrationTestCase
     }
 
     /** @test */
-    public function submits_current_revision_if_many()
+    function submits_current_revision_if_many()
     {
         $user = Factory::create('user');
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
 
         $oldRevision = Factory::create('talkRevision', [
-            'created_at' => '1999-01-01 01:01:01'
+            'created_at' => '1999-01-01 01:01:01',
         ]);
         $talk->revisions()->save($oldRevision);
 
@@ -95,25 +96,23 @@ class SubmissionTest extends IntegrationTestCase
         $this->assertTrue($conference->submissions->contains($revision));
     }
 
-    /**
-     * @test
-     */
-    public function un_submitting_one_revision_of_many_works()
+    /** @test */
+    function un_submitting_one_revision_of_many_works()
     {
         $user = Factory::create('user');
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
 
         $oldRevision = Factory::create('talkRevision', [
             'title' => 'oldie',
-            'created_at' => '1999-01-01 01:01:01'
+            'created_at' => '1999-01-01 01:01:01',
         ]);
         $talk->revisions()->save($oldRevision);
 
         $revision = Factory::create('talkRevision', [
-            'title' => 'submitted i hope'
+            'title' => 'submitted i hope',
         ]);
         $talk->revisions()->save($revision);
 
@@ -131,12 +130,12 @@ class SubmissionTest extends IntegrationTestCase
     }
 
     /** @test */
-    public function un_submitting_does_not_delete_conference()
+    function un_submitting_does_not_delete_conference()
     {
         $user = Factory::create('user');
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
         $revision = Factory::create('talkRevision');
         $talk->revisions()->save($revision);
@@ -149,14 +148,14 @@ class SubmissionTest extends IntegrationTestCase
     }
 
     /** @test */
-    public function user_can_submit_talks_via_http()
+    function user_can_submit_talks_via_http()
     {
         $user = Factory::create('user');
         $this->be($user);
 
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $user->id
+            'author_id' => $user->id,
         ]);
         $revision = Factory::create('talkRevision');
         $talk->revisions()->save($revision);
@@ -164,23 +163,24 @@ class SubmissionTest extends IntegrationTestCase
         $this->post('submissions', [
             'conferenceId' => $conference->id,
             'talkId' => $talk->id,
+            '_token' => csrf_token(),
         ]);
 
         $this->assertTrue($conference->submissions->contains($revision));
     }
 
     /** @test */
-    public function user_cannot_submit_other_users_talk()
+    function user_cannot_submit_other_users_talk()
     {
         $user = Factory::create('user');
         $this->be($user);
         $otherUser = Factory::create('user', [
-            'email' => 'a@b.com'
+            'email' => 'a@b.com',
         ]);
 
         $conference = Factory::create('conference');
         $talk = Factory::create('talk', [
-            'author_id' => $otherUser->id
+            'author_id' => $otherUser->id,
         ]);
         $revision = Factory::create('talkRevision');
         $talk->revisions()->save($revision);
@@ -188,6 +188,7 @@ class SubmissionTest extends IntegrationTestCase
         $this->post('submissions', [
             'conferenceId' => $conference->id,
             'talkId' => $talk->id,
+            '_token' => Session::token(),
         ]);
 
         $this->assertEquals(0, $conference->submissions->count());

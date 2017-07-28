@@ -1,9 +1,10 @@
-<?php namespace App\Http\Controllers\Api;
+<?php
 
-use Illuminate\Support\Facades\App;
+namespace App\Http\Controllers\Api;
+
 use App\ApiResources\Talk;
 use App\OAuthGuard\Facades\OAuthGuard;
-use App\User;
+use Illuminate\Support\Facades\App;
 
 class UserTalksController extends BaseController
 {
@@ -18,7 +19,7 @@ class UserTalksController extends BaseController
             App::abort(404);
         }
 
-        $return = OAuthGuard::user()->talks->map(function ($talk) {
+        $return = OAuthGuard::user()->activeTalks->map(function ($talk) {
             return new Talk($talk);
         })->values();
 

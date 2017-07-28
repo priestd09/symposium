@@ -1,29 +1,22 @@
-<?php namespace App\JoindIn;
+<?php
 
+namespace App\JoindIn;
+
+use App\Conference;
 use Carbon\Carbon;
-use Conference;
 use DateTime;
 use Guzzle\Http\Exception\ClientErrorResponseException;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use JoindIn\Client;
+use JoindIn\Client as JoindInClient;
 
 class ConferenceImporter
 {
-    /**
-     * @var Client
-     */
     private $client;
-    /**
-     * @var integer
-     */
     private $authorId;
 
     public function __construct($authorId = null)
     {
-        $this->client = Client::factory();
-
-        $this->authorId = $authorId ?: Auth::user()->id;
+        $this->client = app(JoindInClient::class);
+        $this->authorId = $authorId ?: auth()->user()->id;
     }
 
     public function import($eventId)
@@ -37,9 +30,9 @@ class ConferenceImporter
     private function getJoindInEvent($eventId)
     {
         try {
-            $event = $this->client->getEvent((int)$eventId);
+            $event = $this->client->getEvent((int) $eventId);
         } catch (ClientErrorResponseException $e) {
-            App::abort('No conference available for #' . $eventId);
+            abort('No conference available for #' . $eventId);
         }
 
         $event = $event[0];
@@ -63,8 +56,8 @@ class ConferenceImporter
 
     private function carbonFromIso($dateFromApi)
     {
-        if ($dateFromApi == null) {
-            return Carbon::create(null);
+        if (! $dateFromApi) {
+            return null;
         }
 
         return Carbon::createFromFormat(DateTime::ISO8601, $dateFromApi);

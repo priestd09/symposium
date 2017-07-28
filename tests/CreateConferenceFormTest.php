@@ -1,8 +1,9 @@
 <?php
 
-use Laracasts\TestDummy\Factory;
+use App\Conference;
 use App\Exceptions\ValidationException;
 use App\Services\CreateConferenceForm;
+use Laracasts\TestDummy\Factory;
 
 class CreateConferenceFormTest extends IntegrationTestCase
 {
@@ -101,6 +102,24 @@ class CreateConferenceFormTest extends IntegrationTestCase
 
         $form = CreateConferenceForm::fillOut($input, Factory::create('user'));
         $form->complete();
+    }
+
+    /**
+     * @test
+     */
+    public function conference_can_be_a_single_day_conference()
+    {
+        $input = [
+            'title' => 'AwesomeConf 2015',
+            'description' => 'The best conference in the world!',
+            'url' => 'http://example.com',
+            'starts_at' => '2015-02-04',
+            'ends_at' => '2015-02-04',
+        ];
+
+        $form = CreateConferenceForm::fillOut($input, Factory::create('user'));
+        $form->complete();
+        // No assertions, as it should throw an exception on error.
     }
 
     /**

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Captcha\Captcha;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\Controller;
-use App\User;
 
 class PublicProfileController extends Controller
 {
@@ -28,6 +27,23 @@ class PublicProfileController extends Controller
 
         return view('account.public-profile.index')
             ->with('speakers', $users);
+    }
+
+    public function search(Request $request)
+    {
+        $users = User::search($request->get('query'))
+            ->orderBy('name', 'asc')->get();
+
+        // Since Scout searches can only perform rudimentary where clauses,
+        // we must filter search results to only validly public profiles.
+        $filteredUsers = $users->filter(function ($user) {
+            return $user->enable_profile == true &&
+                !is_null($user->profile_slug);
+        });
+
+        return view('account.public-profile.index')
+            ->with('speakers', $filteredUsers)
+            ->with('query', $request->get('query'));
     }
 
     public function show($profile_slug)
